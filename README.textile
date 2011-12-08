@@ -17,8 +17,8 @@ h2. Installation
 This library has been developed against and designed for MRI 1.9.2 in a UNIX environment. It should be compatible with 1.8.6+, as well as with other Ruby implementations, but no guarantees. Probably not compatible with Windows environments.
 
 <pre>
-Using RubyGems - _gem install smooth\_s3_
-Using Bundler - _gem "smooth\_s3"_ in Gemfile, then _bundle install_
+Using RubyGems - gem install smooth_s3
+Using Bundler - gem "smooth_s3" in Gemfile, then bundle install
 </pre>
 
 h2. Overview
@@ -27,13 +27,13 @@ Before running upload operations using Smooth S3, you will need to initialize th
 
 Once that is done you can use the following methods:
 
-* _upload()_ - Regular file upload. Can specify multiple files at once. Directory structure is not preserved, only the file name.
+* upload() - Regular file upload. Can specify multiple files at once. Directory structure is not preserved, only the file name.
 
-* _sync\_directory()_ - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
+* sync_directory() - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
  
-* _timestamped\_upload()_ - Like a regular upload. Files uploaded this way have a timestamp added in front of their names. Default timestamp format: YYYYmmddHHMMSS  
+* timestamped_upload() - Like a regular upload. Files uploaded this way have a timestamp added in front of their names. Default timestamp format: YYYYmmddHHMMSS  
 
-* _timestamped\_directory\_sync()_ Like a regular directory sync. Provided directory has a timestamp added in front of its name. Default timestamp format: YYYYmmddHHMMS
+* timestamped_directory_sync() Like a regular directory sync. Provided directory has a timestamp added in front of its name. Default timestamp format: YYYYmmddHHMMS
 
 Each of the 4 methods above also has a bang(!) version available. The difference between the regular and bang version is that the former won't overwrite existing files in the selected bucket, while the latter will.
 
