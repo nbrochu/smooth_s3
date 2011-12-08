@@ -1,2 +1,7 @@
 .rvmrc
 sandbox.rb
+pkg/
+.DS_Store
+README.rdoc
+Rakefile
+smooth_s3.gemspec
