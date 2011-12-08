@@ -1,0 +1,111 @@
+h1. Smooth S3
+
+"http://github.com/nbrochu/smooth_s3":http://github.com/nbrochu/smooth_s3
+
+h2. Summary
+
+A user-friendly superset of the S3 gem geared towards file system backup operations.
+
+h2. Description
+
+Smooth S3 is a user-friendly superset of the S3 gem geared towards file system backup operations. It greatly simplifies regular file uploads to S3 by using Convention over Configuration™. The library also adds new features such as directory syncronization and timestamped uploads, which should come in real handy to anyone doing backup scripts on a regular basis. A decent amount of control is left to the developer: You can specify a prefix path to use with any upload and provide your own timestamp formats if desired.
+
+The goal with Smooth S3 is to facilitate and simplify your S3 uploads. It is a library focused on the file system, so no integration with MySQL, third-party services or anything like that. Nothing prevents you from doing a _mysqldump_ and uploading the results in the same script using Smooth S3 though ;)
+
+h2. Installation
+
+This library has been developed against and designed for MRI 1.9.2 in a UNIX environment. It should be compatible with 1.8.6+, as well as with other Ruby implementations, but no guarantees. Probably not compatible with Windows environments.
+
+<pre>
+Using RubyGems - _gem install smooth\_s3_
+Using Bundler - _gem "smooth\_s3"_ in Gemfile, then _bundle install_
+</pre>
+
+h2. Overview
+
+Before running upload operations using Smooth S3, you will need to initialize the service using your AWS credentials.
+
+Once that is done you can use the following methods:
+
+* _upload()_ - Regular file upload. Can specify multiple files at once. Directory structure is not preserved, only the file name.
+
+* _sync\_directory()_ - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
+ 
+* _timestamped\_upload()_ - Like a regular upload. Files uploaded this way have a timestamp added in front of their names. Default timestamp format: YYYYmmddHHMMSS  
+
+* _timestamped\_directory\_sync()_ Like a regular directory sync. Provided directory has a timestamp added in front of its name. Default timestamp format: YYYYmmddHHMMS
+
+Each of the 4 methods above also has a bang(!) version available. The difference between the regular and bang version is that the former won't overwrite existing files in the selected bucket, while the latter will.
+
+You can also specify a prefix as an option to the above methods. This will be inserted in front of what would have been the normal path on S3. For example, you upload _'test.rb'_ with the prefix _'path/to'_. It will show up on S3 as _'path/to/test.rb'_
+
+That's it! Code examples in the next section.
+
+h2. How to use
+
+<pre>
+require 'rubygems' # if using 1.8
+require 'smooth_s3'
+
+# Initialize the service
+# Params: :aws_key, :aws_secret(, :ssl => false)
+ 
+@service = SmoothS3::Service.new(:aws_key => "MY_AWS_ACCESS_KEY", :aws_secret => "MY_AWS_SECRET_KEY")
+
+
+# upload()
+# Params: bucket_name, files(, :prefix)
+
+@service.upload("my_test_bucket", "test.rb")
+@service.upload!("my_test_bucket", ["here.rb", "../parent.rb"], :prefix => "prefix/to/files")
+
+
+# sync_directory()
+# Params: bucket_name, directory(, :prefix)
+
+@service.sync_directory("my_test_bucket", "../reports")
+@service.sync_directory!("my_test_bucket", "data", :prefix => "prefix/to/dir")
+
+
+# timestamped_upload()
+# Params: bucket_name, files(, :prefix, :timestamp_type => :epoch/:strftime(default), :timestamp_format => "%Y%m%d%H%M%S" )
+
+@service.timestamped_upload("my_test_bucket", "test.rb")
+@service.timestamped_upload!("my_test_bucket", "test.rb", :timestamp_type => :epoch)
+@service.timestamped_upload!("my_test_bucket", "test.rb", :timestamp_type => :strftime, :timestamp_format => "%Y%m%d")
+
+
+# timestamped_directory_sync()
+# Params: bucket_name, directory(, :prefix, :timestamp_type => :epoch/:strftime(default), :timestamp_format => "%Y%m%d%H%M%S" )
+
+@service.timestamped_directory_sync("my_test_bucket", "data")
+@service.timestamped_directory_sync!("my_test_bucket", "data", :timestamp_type => :epoch)
+@service.timestamped_directory_sync!("my_test_bucket", "data", :timestamp_type => :strftime, :timestamp_format => "%Y%m%d")
+</pre>
+
+h2. Credits
+
+* Jakub Kuźma for his great S3 library, often overshadowed by the popular but old AWS-S3.
+
+h2. LICENSE
+
+Copyright (c) 2011 - Nicholas Brochu
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
