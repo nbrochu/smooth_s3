@@ -1,0 +1,10 @@
+### 0.2.0 ###
+  - Refactoring run
+  - Connection errors and failed uploads are properly rescued now
+  - Uploads/Connections will now be tried up to 3 times before moving on to the next file 
+
+### 0.1.1 ###
+  - Removed dependency to jeweler (oops!)
+
+### 0.1.0 ###
+  - First release

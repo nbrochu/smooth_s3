@@ -45,13 +45,34 @@ module SmoothS3
 
       bo = b.objects.build(remote_file)
       bo.content = open(file)
-      
-      if bo.save
+ 
+      if Bucket.save_with_retries(3, bo, file)
         puts "'#{file}' was uploaded to S3 bucket '#{bucket}' under the name '#{remote_file}'."
       else
-        puts "There was a problem trying to upload '#{file}' to S3"
+        puts "Impossible to upload '#{file}' to S3 (retries were attempted). Please check file permissions."
       end
     end
+
+    private
+
+      def self.save_with_retries(tries, bucket_object, file)
+        done, attempts_left = false, tries
+
+        until done
+          break if attempts_left <= 0
+
+          begin
+            bucket_object.save
+            done = true
+          rescue
+            puts "There was a problem trying to upload '#{file}' to S3. Retrying..."
+          end
+
+          attempts_left -= 1
+        end
+
+        done
+      end
 
   end
 end
