@@ -33,8 +33,7 @@ module SmoothS3
       b = service.proxy_service.buckets.find_first(bucket)
 
       if prefix
-        remote_file = prefix + remote_file  if prefix =~ /\/$/
-        remote_file = prefix + "/" + remote_file unless prefix =~ /\/$/
+        remote_file = prefix =~ /\/$/ ? (prefix + remote_file) : prefix + "/" + remote_file
       end
 
       unless overwrite == true

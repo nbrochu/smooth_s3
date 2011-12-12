@@ -2,87 +2,55 @@ module SmoothS3
   class Uploader
 
     def self.upload(service, bucket, files, options={})
-      options[:overwrite] = false unless options[:overwrite]
+      [:overwrite, :timestamped].each {|s| options[s] = false unless options[s]}
       Bucket.select(bucket, service)
       
       valid_files = Uploader.validate_files(files)
       valid_files.each do |vf|
-        Bucket.store_file(vf, vf.split("/")[-1], bucket, service, options[:prefix], options[:overwrite])
+        remote_file_name = options[:timestamped] ? (options[:timestamp] + "_" + vf.split("/")[-1]) : vf.split("/")[-1]
+        Bucket.store_file(vf, remote_file_name, bucket, service, options[:prefix], options[:overwrite])
       end
     end
 
     def self.upload!(service, bucket, files, options={})
-      options.merge!(:overwrite => true)
-      Uploader.upload(service, bucket, files, options)
+      Uploader.upload(service, bucket, files, options.merge!(:overwrite => true))
     end
 
     def self.sync_directory(service, bucket, directory, options={})
-      options[:overwrite] = false unless options[:overwrite]
+      [:overwrite, :timestamped].each {|s| options[s] = false unless options[s]}
       Bucket.select(bucket, service)
 
       valid_files = Uploader.validate_files_in_directory(directory)
       valid_files.each do |vf|
-        Bucket.store_file(vf[0], vf[1], bucket, service, options[:prefix], options[:overwrite])
+        remote_file_name = options[:timestamped] ? (options[:timestamp] + "_" + vf[1]) : vf[1]
+        Bucket.store_file(vf[0], remote_file_name, bucket, service, options[:prefix], options[:overwrite])
       end
     end
 
     def self.sync_directory!(service, bucket, directory, options={})
-      options.merge!(:overwrite => true)
-      Uploader.sync_directory(service, bucket, directory, options)
+      Uploader.sync_directory(service, bucket, directory, options.merge!(:overwrite => true))
     end
 
     def self.timestamped_upload(service, bucket, files, options={})
       options[:overwrite] = false unless options[:overwrite]
-      Bucket.select(bucket, service)
-
-      if options[:timestamp_type] == :epoch
-        timestamp = Time.now.strftime("%s")
-      elsif options[:timestamp_type] == :strftime
-        if options[:timestamp_format]
-          timestamp = Time.now.strftime(options[:timestamp_format])
-        else
-          timestamp = Uploader.default_timestamp
-        end
-      else
-        timestamp = Uploader.default_timestamp
-      end
-
-      valid_files = Uploader.validate_files(files)
-      valid_files.each do |vf|
-        Bucket.store_file(vf, timestamp + "_" + vf.split("/")[-1], bucket, service, options[:prefix], options[:overwrite])
-      end
+      
+      timestamp = Uploader.calculate_timestamp(options)
+      Uploader.upload(service, bucket, files, options.merge!(:timestamped => true, :timestamp => timestamp))
     end
 
     def self.timestamped_upload!(service, bucket, files, options={})
-      options.merge!(:overwrite => true)
-      Uploader.timestamped_upload(service, bucket, files, options)
+      Uploader.timestamped_upload(service, bucket, files, options.merge!(:overwrite => true))
     end
 
     def self.timestamped_directory_sync(service, bucket, directory, options={})
       options[:overwrite] = false unless options[:overwrite]
-      Bucket.select(bucket, service)
 
-      if options[:timestamp_type] == :epoch
-        timestamp = Time.now.strftime("%s")
-      elsif options[:timestamp_type] == :strftime
-        if options[:timestamp_format]
-          timestamp = Time.now.strftime(options[:timestamp_format])
-        else
-          timestamp = Uploader.default_timestamp
-        end
-      else
-        timestamp = Uploader.default_timestamp
-      end
-
-      valid_files = Uploader.validate_files_in_directory(directory)
-      valid_files.each do |vf|
-        Bucket.store_file(vf[0], timestamp + "_" + vf[1], bucket, service, options[:prefix], options[:overwrite])
-      end
+      timestamp = Uploader.calculate_timestamp(options)
+      Uploader.sync_directory(service, bucket, directory, options.merge!(:timestamped => true, :timestamp => timestamp))
     end
 
     def self.timestamped_directory_sync!(service, bucket, directory, options={})
-      options.merge!(:overwrite => true)
-      Uploader.timestamped_directory_sync(service, bucket, directory, options)
+      Uploader.timestamped_directory_sync(service, bucket, directory, options.merge!(:overwrite => true))
     end
 
     private
@@ -119,6 +87,18 @@ module SmoothS3
         end
 
         valid_files
+      end
+
+      def self.calculate_timestamp(options)
+        timestamp = nil
+
+        if options[:timestamp_type] == :epoch
+          timestamp = Time.now.strftime("%s")
+        elsif options[:timestamp_type] == :strftime && options[:timestamp_format]
+          timestamp = Time.now.strftime(options[:timestamp_format])
+        end
+
+        timestamp || Uploader.default_timestamp
       end
 
       def self.default_timestamp
