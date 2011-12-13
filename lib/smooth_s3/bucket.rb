@@ -2,16 +2,16 @@ module SmoothS3
   class Bucket
     
     def self.exists?(bucket, service)
-      service.buckets.include? bucket
+      service.refresh.buckets.keys.include? bucket
     end
 
     def self.file_exists?(file, bucket, service)
-      b = service.proxy_service.buckets.find_first(bucket)
+      b = service.buckets[bucket]
 
       begin
         b.objects.find_first(file)
         return true
-      rescue S3::Error::NoSuchKey
+      rescue
         return false
       end
     end
@@ -27,10 +27,12 @@ module SmoothS3
       rescue S3::Error::BucketAlreadyExists
         raise SmoothS3::Error, "A bucket named '#{bucket_name}' already exists in the Global S3 Namespace. Please select one of you existing buckets or try a new name."
       end
+
+      Service.new_buckets[service.aws_key] << new_bucket
     end
 
     def self.store_file(file, remote_file, bucket, service, prefix, overwrite)
-      b = service.proxy_service.buckets.find_first(bucket)
+      b = service.refresh.buckets[bucket]
 
       if prefix
         remote_file = prefix =~ /\/$/ ? (prefix + remote_file) : prefix + "/" + remote_file

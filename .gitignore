@@ -5,3 +5,4 @@ pkg/
 README.rdoc
 Rakefile
 smooth_s3.gemspec
+*.gem

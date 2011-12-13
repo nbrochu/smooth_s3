@@ -16,7 +16,7 @@ module SmoothS3
       Uploader.upload(service, bucket, files, options.merge!(:overwrite => true))
     end
 
-    def self.sync_directory(service, bucket, directory, options={})
+    def self.directory_sync(service, bucket, directory, options={})
       [:overwrite, :timestamped].each {|s| options[s] = false unless options[s]}
       Bucket.select(bucket, service)
 
@@ -27,8 +27,8 @@ module SmoothS3
       end
     end
 
-    def self.sync_directory!(service, bucket, directory, options={})
-      Uploader.sync_directory(service, bucket, directory, options.merge!(:overwrite => true))
+    def self.directory_sync!(service, bucket, directory, options={})
+      Uploader.directory_sync(service, bucket, directory, options.merge!(:overwrite => true))
     end
 
     def self.timestamped_upload(service, bucket, files, options={})
@@ -46,11 +46,17 @@ module SmoothS3
       options[:overwrite] = false unless options[:overwrite]
 
       timestamp = Uploader.calculate_timestamp(options)
-      Uploader.sync_directory(service, bucket, directory, options.merge!(:timestamped => true, :timestamp => timestamp))
+      Uploader.directory_sync(service, bucket, directory, options.merge!(:timestamped => true, :timestamp => timestamp))
     end
 
     def self.timestamped_directory_sync!(service, bucket, directory, options={})
       Uploader.timestamped_directory_sync(service, bucket, directory, options.merge!(:overwrite => true))
+    end
+
+    # Preserve backwards compatibility
+    class << self
+      alias_method :sync_directory, :directory_sync
+      alias_method :sync_directory!, :directory_sync!
     end
 
     private

@@ -1,7 +1,9 @@
 ### 0.2.0 ###
   - Refactoring run
-  - Connection errors and failed uploads are properly rescued now
-  - Uploads/Connections will now be tried up to 3 times before moving on to the next file 
+  - Connection errors and failed uploads are now all properly rescued by appropriate logic.
+  - Uploads will now be tried up to 3 times before moving on to the next file.
+  - Caching service buckets when initializing, saving tons of requests. This speeds up directory sync operations a lot.
+  - Renamed sync_directory(!) to directory_sync(!) for consistency. Old method names are aliased for backward compatibility.
 
 ### 0.1.1 ###
   - Removed dependency to jeweler (oops!)
