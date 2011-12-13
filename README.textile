@@ -29,7 +29,7 @@ Once that is done you can use the following methods:
 
 * upload() - Regular file upload. Can specify multiple files at once. Directory structure is not preserved, only the file name.
 
-* sync_directory() - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
+* directory_sync() - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
  
 * timestamped_upload() - Like a regular upload. Files uploaded this way have a timestamp added in front of their names. Default timestamp format: YYYYmmddHHMMSS  
 
@@ -60,11 +60,11 @@ require 'smooth_s3'
 @service.upload!("my_test_bucket", ["here.rb", "../parent.rb"], :prefix => "prefix/to/files")
 
 
-# sync_directory()
+# directory_sync()
 # Params: bucket_name, directory(, :prefix)
 
-@service.sync_directory("my_test_bucket", "../reports")
-@service.sync_directory!("my_test_bucket", "data", :prefix => "prefix/to/dir")
+@service.directory_sync("my_test_bucket", "../reports")
+@service.directory_sync!("my_test_bucket", "data", :prefix => "prefix/to/dir")
 
 
 # timestamped_upload()
@@ -85,7 +85,7 @@ require 'smooth_s3'
 
 h2. Credits
 
-* Jakub Kuźma for his great S3 library, often overshadowed by the popular but old AWS-S3.
+* Jakub Kuźma for his great S3 library, often overshadowed by AWS-S3.
 
 h2. LICENSE
 
