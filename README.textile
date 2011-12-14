@@ -12,6 +12,16 @@ Smooth S3 is a user-friendly superset of the S3 gem geared towards file system b
 
 The goal with Smooth S3 is to facilitate and simplify your S3 uploads. It is a library focused on the file system, so no integration with MySQL, third-party services or anything like that. Nothing prevents you from doing a _mysqldump_ and uploading the results in the same script using Smooth S3 though ;)
 
+h2. Why Use Smooth S3?
+
+Aren't the AWS/S3 and S3 gems already good enough? Well yes, they are, but all they do is wrap the AWS S3 API. They do an awesome job at it, mind you, but if you've had to write more than a few apps and/or scripts where you need to use S3, you know that there is quite a bit of boilerplate code required even for the simplest upload operations.
+
+There was an opportunity to make all of this way simpler (or, _puts on sunglasses_, smoother), and out of that opportunity Smooth S3 was born. For the people who like bullet points, here are a few reasons why you should probably use it:
+
+* **Smart Defaults** - No more boilerplate code. Once the service is initialized (a one-liner, of course), you only need to specify bucket and file(s) and with one method call on the service. The bucket doesn't exists? No problem. It will be created
+
+[INCOMPLETE]
+
 h2. Installation
 
 This library has been developed against and designed for MRI 1.9.2 in a UNIX environment. It should be compatible with 1.8.6+, as well as with other Ruby implementations, but no guarantees. Probably not compatible with Windows environments.
