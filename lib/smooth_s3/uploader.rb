@@ -8,7 +8,7 @@ module SmoothS3
       valid_files = Uploader.validate_files(files)
       valid_files.each do |vf|
         remote_file_name = options[:timestamped] ? (options[:timestamp] + "_" + vf.split("/")[-1]) : vf.split("/")[-1]
-        Bucket.store_file(vf, remote_file_name, bucket, service, options[:prefix], options[:overwrite])
+        Bucket.store_file(vf, remote_file_name, bucket, service, options)
       end
     end
 
@@ -20,10 +20,10 @@ module SmoothS3
       [:overwrite, :timestamped].each {|s| options[s] = false unless options[s]}
       Bucket.select(bucket, service)
 
-      valid_files = Uploader.validate_files_in_directory(directory)
+      valid_files = Uploader.validate_files_in_directory(directory, options)
       valid_files.each do |vf|
         remote_file_name = options[:timestamped] ? (options[:timestamp] + "_" + vf[1]) : vf[1]
-        Bucket.store_file(vf[0], remote_file_name, bucket, service, options[:prefix], options[:overwrite])
+        Bucket.store_file(vf[0], remote_file_name, bucket, service, options)
       end
     end
 
@@ -78,7 +78,7 @@ module SmoothS3
         valid_files
       end
 
-      def self.validate_files_in_directory(directory)
+      def self.validate_files_in_directory(directory, options)
         valid_files = []
 
         begin
@@ -92,7 +92,27 @@ module SmoothS3
           raise SmoothS3::Error, "'#{directory}' is not a valid directory."
         end
 
-        valid_files
+        Uploader.filter_files(valid_files, options)
+      end
+
+      def self.filter_files(files, options)
+        [:except, :only].each { |o| options[o] = options[o].class == Regexp ? [options[o]] : options[o] }
+        except, only = [], []
+
+        files.each do |f|
+          options[:except].each {|r| except << f if f[0] =~ r} if options[:except]
+          options[:only].each {|r| only << f if f[0] =~ r} if options[:only]
+        end
+
+        if options[:except] && options[:only]
+          filtered_files = only - except
+        elsif options[:except]
+          filtered_files = files - except
+        elsif options[:only]
+          filtered_files = only
+        else
+          filtered_files = files
+        end
       end
 
       def self.calculate_timestamp(options)

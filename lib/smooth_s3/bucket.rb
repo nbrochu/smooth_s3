@@ -31,14 +31,14 @@ module SmoothS3
       Service.new_buckets[service.aws_key] << new_bucket
     end
 
-    def self.store_file(file, remote_file, bucket, service, prefix, overwrite)
+    def self.store_file(file, remote_file, bucket, service, options)
       b = service.refresh.buckets[bucket]
 
-      if prefix
-        remote_file = prefix =~ /\/$/ ? (prefix + remote_file) : prefix + "/" + remote_file
+      if options[:prefix]
+        remote_file = options[:prefix] =~ /\/$/ ? (options[:prefix] + remote_file) : options[:prefix] + "/" + remote_file
       end
 
-      unless overwrite == true
+      unless options[:overwrite] == true
         if Bucket.file_exists?(remote_file, bucket, service)
           puts "'#{remote_file}' already exists on S3 bucket named '#{bucket}'. Use the bang(!) version of the method to overwrite."
           return
