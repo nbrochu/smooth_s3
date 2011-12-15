@@ -18,9 +18,13 @@ Aren't the AWS/S3 and S3 gems already good enough? Well yes, they are, but all t
 
 There was an opportunity to make all of this way simpler (or, _puts on sunglasses_, smoother), and out of that opportunity Smooth S3 was born. For the people who like bullet points, here are a few reasons why you should probably use it:
 
-* **Smart Defaults** - No more boilerplate code. Once the service is initialized (a one-liner, of course), you only need to specify bucket and file(s) and with one method call on the service. The bucket doesn't exists? No problem. It will be created
+* **Smart defaults** - No more boilerplate code. Once the service is initialized (a one-liner, of course), you only need to specify bucket and file(s) and they will be uploaded with a single method call on the service. The bucket doesn't exist? No problem. As long as the name you provided is unique in the S3 global namespace, it will be created. Want to overwrite existing files in the bucket? Add a bang(!) to your method. You get the gist of it.
 
-[INCOMPLETE]
+* **Few methods, lots of power** - On top of service initialization, the library currently only offers 4 methods (that could technically, and may eventually be reduced to 2) so it is pretty darn simple to use. Options are used to arm that simplicity with some power. There is a good chance that by combining options, you will get your uploads to behave the way you want with SmoothS3. If not, fork away or suggest one in the issues! :)
+
+* **No raising, unless absolutely necessary** - The established S3 libraries are pretty trigger-happy when it comes to raising exceptions. We all love Fail Fast™ but there are times when it's simply not the right approach, such as with backups. Sure, you will eventually have rescued everything but by then, your codebase will have tripled. Smooth S3 only raises when it absolutely has no choice to do so (ex: Wrong AWS credentials). Failed uploads are retried a few times, then skipped with a log message if they are still a no-go (permissions etc.). Bucket and object operations are also retried in case of a random HTTP failures and won't throw exceptions if you look for a non-existant one.
+
+* **Dogfood is being eaten** - Smooth S3 is being used in production to back up 100+ GBs of unique data daily over here at "Needium":http://needium.com. Most options that are added are derived from our direct needs, so you can be certain that the library will remain supported and new features will keep being added.
 
 h2. Installation
 
