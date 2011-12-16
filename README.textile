@@ -41,13 +41,13 @@ Before running upload operations using Smooth S3, you will need to initialize th
 
 Once that is done you can use the following methods:
 
-* upload() - Regular file upload. Can specify multiple files at once. Directory structure is not preserved, only the file name.
+* **upload()** - Regular file upload. Can specify multiple files at once. Directory structure is not preserved, only the file name.
 
-* directory_sync() - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
+* **directory_sync()** - Uploads the entire content of a directory and its subdirectories. Preserves folder directory structure inside S3.
  
-* timestamped_upload() - Like a regular upload. Files uploaded this way have a timestamp added in front of their names. Default timestamp format: YYYYmmddHHMMSS  
+* **timestamped_upload()** - Like a regular upload. Files uploaded this way have a timestamp added in front of their names. Default timestamp format: YYYYmmddHHMMSS  
 
-* timestamped_directory_sync() Like a regular directory sync. Provided directory has a timestamp added in front of its name. Default timestamp format: YYYYmmddHHMMS
+* **timestamped_directory_sync()** - Like a regular directory sync. Provided directory has a timestamp added in front of its name. Default timestamp format: YYYYmmddHHMMS
 
 Each of the 4 methods above also has a bang(!) version available. The difference between the regular and bang version is that the former won't overwrite existing files in the selected bucket, while the latter will.
 
@@ -75,10 +75,12 @@ require 'smooth_s3'
 
 
 # directory_sync()
-# Params: bucket_name, directory(, :prefix)
+# Params: bucket_name, directory(, :prefix, :only, :except)
 
 @service.directory_sync("my_test_bucket", "../reports")
 @service.directory_sync!("my_test_bucket", "data", :prefix => "prefix/to/dir")
+@service.directory_sync("my_test_bucket", "../reports", :only => /\.json/)
+@service.directory_sync("my_test_bucket", "../reports", :except => [/\.xml/, /\.txt/])
 
 
 # timestamped_upload()
@@ -90,7 +92,7 @@ require 'smooth_s3'
 
 
 # timestamped_directory_sync()
-# Params: bucket_name, directory(, :prefix, :timestamp_type => :epoch/:strftime(default), :timestamp_format => "%Y%m%d%H%M%S" )
+# Params: bucket_name, directory(, :prefix, :timestamp_type => :epoch/:strftime(default), :timestamp_format => "%Y%m%d%H%M%S", :only, :except )
 
 @service.timestamped_directory_sync("my_test_bucket", "data")
 @service.timestamped_directory_sync!("my_test_bucket", "data", :timestamp_type => :epoch)
