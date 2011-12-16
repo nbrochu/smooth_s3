@@ -11,5 +11,5 @@ require 'smooth_s3/uploader.rb'
 require 'smooth_s3/error.rb'
 
 module SmoothS3
-  VERSION = "0.2.0"
+  VERSION = "0.2.1"
 end
